@@ -1,3 +1,35 @@
+def checkUser(username):
+	errors = []
+	
+	if not len(username) >= 4:
+		errors.append("Username length should be more than or equaltu to 4")
+		
+	return errors
+
+
+def checkPass(passWord):
+	import re	
+	errors = []
+	
+	if not any(x.isupper() for x in passWord):
+		errors.append("Your password needs at least 1 Capital")
+	if not any(x.islower() for x in passWord):
+		errors.append("Your password needs at least 1 Lower")
+	if not any(x.isdigit() for x in passWord):
+		errors.append("Your Password needs at least 1 number")
+	#Checking either password string have a special character or not
+	string_check= re.compile('[@_!#$%^&*()<>?/\|}{~:]')
+	if string_check.search(passWord) == None:
+		errors.append("Your password needds at least a special character")
+	
+	if not len(passWord) >= 8:
+		errors.append("Yours Password length should be at least 8")
+	return errors
+
+
+
+
+
 
 
 def sign_up(username, password):
@@ -29,24 +61,32 @@ def sign_up(username, password):
 
 		#username = input("Enter your username : ")
 		username = str(username)
-
+		uerror = checkUser(username)
 		if username in users_list:
 			print("This username already present please pick a different username")
 			signup_flag = False
 			break
-		elif username == "":
-			print("Username is empty")
-			signup_flag = False
-			break 
+
+		elif len(uerror) != 0:
+			print(uerror)
+			break
 		else:
 			#p = getpass.getpass()
 			p = str(password)
-			#generate hash for password
-			phash = hashlib.sha256(p.encode('utf-8')).hexdigest()
-			#put data
-			curs.execute('INSERT INTO users ( username, password) VALUES(?,? )',(str(username),str(phash)))
-			signup_flag = True
-			break
+			perror = checkPass(p)
+			
+			if len(perror) != 0:
+				print(perror)
+				signup_flag = False
+				break
+			else:
+			
+				#generate hash for password
+				phash = hashlib.sha256(p.encode('utf-8')).hexdigest()
+				#put data
+				curs.execute('INSERT INTO users (			 username, password) VALUES(?,? )',(str(username),str(phash)))
+				signup_flag = True
+				break
 
 
 	curs.close()
